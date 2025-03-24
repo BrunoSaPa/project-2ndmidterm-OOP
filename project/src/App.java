@@ -67,4 +67,22 @@ public class App {
         personas.add(arbitro);
         System.out.println("Árbitro registrado con éxito: " + arbitro.getNombre());
     }
+
+    /*
+        Board b = new Board();
+
+        b.fillMatrixWithRandom();
+        b.fillWordList();
+        b.putWordsInMatrix();
+        b.quitWordInMatrix(b.wordList[0]);
+        b.quitWordInMatrix(b.wordList[1]);
+        b.quitWordInMatrix(b.wordList[2]);
+        b.quitWordInMatrix(b.wordList[3]);
+        b.quitWordInMatrix(b.wordList[4]);
+        b.quitWordInMatrix(b.wordList[5]);
+        b.quitWordInMatrix(b.wordList[6]);
+        b.quitWordInMatrix(b.wordList[7]);
+        b.printMatrix();
+        System.out.println("\n\n");
+     */
 }
