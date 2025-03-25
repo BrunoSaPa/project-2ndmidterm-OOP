@@ -1,5 +1,3 @@
-import Game.Board;
-
 public class App {
     /*private static List<Persona> personas = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);

@@ -1,4 +1,3 @@
-package Game;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -42,8 +41,15 @@ public class Board {
 
     private char[][] matrix = new char[16][16];
     public Word[] wordList = new Word[8];
+    public int wordsFound = 0;
     private Random r = new Random();
     private boolean[][] occupiedCells = new boolean[16][16];
+
+    Board(){
+        System.out.println("A new game is about to start...\n\n");
+        this.fillWordList();
+        this.putWordsInMatrix();
+    }
 
 
     private void markCellsOccupied(Word word) {
@@ -213,7 +219,7 @@ public class Board {
                 T = Word.TYPEOF.VerDown;
                 break;
 
-            case "Horizontal Right":
+            case "Horizontal right":
                 T = Word.TYPEOF.HorRight;
                 break;
             default:
@@ -224,6 +230,7 @@ public class Board {
         for (Word word : this.wordList){
             if(word.VerifyGuess(x-1, y-1, T)){
                 this.quitWordInMatrix(word);
+                this.wordsFound++;
                 return true;
             }
         }
