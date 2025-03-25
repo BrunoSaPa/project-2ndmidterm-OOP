@@ -1,9 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import Game.Board;
 
 public class App {
-    private static List<Persona> personas = new ArrayList<>();
+    /*private static List<Persona> personas = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -66,10 +64,12 @@ public class App {
         Arbitro arbitro = new Arbitro(nombre, edad, personas.size() + 1, experiencia);
         personas.add(arbitro);
         System.out.println("Árbitro registrado con éxito: " + arbitro.getNombre());
-    }
+    }*/
 
-    /*
+
+    public static void main(String[] args) {
         Board b = new Board();
+
 
         b.fillMatrixWithRandom();
         b.fillWordList();
@@ -83,6 +83,6 @@ public class App {
         b.quitWordInMatrix(b.wordList[6]);
         b.quitWordInMatrix(b.wordList[7]);
         b.printMatrix();
-        System.out.println("\n\n");
-     */
+        System.out.println("\n\n"); 
+    }
 }
