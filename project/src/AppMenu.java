@@ -113,6 +113,7 @@ public class AppMenu {
             while (true) {
                 System.out.print("Please enter your name:\t");
                 name = this.sc.nextLine();
+                name = this.sc.nextLine();
     
                 if(this.PlayersRegister.containsKey(name)) System.out.println("This user name already exists, try with another one.");
                 else break;

@@ -242,10 +242,14 @@ public class Game implements Statistics{
     }
 
     public void increaseAllTurnosJugados(){
-        this.localJugador1.increaseTurnosJugados();
-        this.localJugador2.increaseTurnosJugados();
-        this.Jugador1.increaseTurnosJugados();
-        this.Jugador2.increaseTurnosJugados();
+        if (this.actualPlayer == 1){
+            this.localJugador1.increaseTurnosJugados();
+            this.Jugador1.increaseTurnosJugados();
+        } else{
+            this.localJugador2.increaseTurnosJugados();
+            this.Jugador2.increaseTurnosJugados();
+        }
+
         this.increaseTurnosJugados();
     }
 
