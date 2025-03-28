@@ -33,9 +33,10 @@ public class Persona {
         this.id = id;
     }
 
-    public void getDatos() {
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Edad: " + edad);
-        System.out.println("ID: " + id);
+    public String getDatos() {
+        return "Nombre: " + this.nombre + "\n" +
+               "Edad: " + this.edad + "\n" +
+               "ID: " + this.id;
     }
+    
 }

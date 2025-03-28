@@ -67,11 +67,12 @@ public class Jugador extends Persona implements Statistics {
 
 
     @Override
-    public void getDatos() {
-        super.getDatos();
-        System.out.println("Puntuación total: " + puntuacionTotal);
-        System.out.println("Juegos jugados: " + juegosJugados);
-        System.out.println("Juegos ganados: " + juegosGanados);
-        System.out.println("Turnos jugados: " + turnosJugados);
+    public String getDatos() {
+        return super.getDatos() + "\n" +
+               "Puntuación total: " + puntuacionTotal + "\n" +
+               "Juegos jugados: " + juegosJugados + "\n" +
+               "Juegos ganados: " + juegosGanados + "\n" +
+               "Turnos jugados: " + turnosJugados;
     }
+    
 }

@@ -14,10 +14,12 @@ public class Arbitro extends Persona {
         this.experiencia = experiencia;
     }
 
+
+
     @Override
-    public void getDatos() {
-        super.getDatos();
-        System.out.println("Experiencia: " + experiencia);
-        
-    }
+public String getDatos() {
+    return super.getDatos() + "\n" +
+           "Experiencia: " + experiencia;
+}
+
 }
