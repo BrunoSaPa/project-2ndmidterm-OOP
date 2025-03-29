@@ -87,7 +87,70 @@ public class AppMenuGUI {
     }
     
     public void newGame() {
-        textArea.append("New game created!\n");
+        textArea.setText("");
+
+        String[] Players = PlayersRegister.keySet().toArray(new String[0]);
+        String[] Referees = RefereeRegister.keySet().toArray(new String[0]);
+
+        JComboBox<String> comboBoxPlayer1 = new JComboBox<>(Players);
+        JComboBox<String> comboBoxPlayer2 = new JComboBox<>(Players);
+        JComboBox<String> comboBoxReferees = new JComboBox<>(Referees);
+
+        comboBoxPlayer1.setPreferredSize(new Dimension(100,2));
+        comboBoxPlayer2.setPreferredSize(new Dimension(100,2));
+        comboBoxReferees.setPreferredSize(new Dimension(100,2));
+
+        JLabel formTitle = new JLabel("Game constructor\n\n");
+        formTitle.setFont(new Font("Arial", Font.BOLD, 24));
+
+        JPanel gamePanel = new JPanel(new GridLayout(0,1));
+        gamePanel.add(formTitle);
+        gamePanel.add(new JLabel("Player 1:\t"));
+        gamePanel.add(comboBoxPlayer1);
+        gamePanel.add(new JLabel("Player 2:\t"));
+        gamePanel.add(comboBoxPlayer2);
+        gamePanel.add(new JLabel("Referee:\t"));
+        gamePanel.add(comboBoxReferees);
+
+        gamePanel.setPreferredSize(new Dimension(200,300));
+
+        String[] options = {"Create", "Cancel"};
+        while (true) {
+            int selection = JOptionPane.showOptionDialog(frame, gamePanel, "New Game", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0] );
+    
+            if (selection == 0){
+
+                if(comboBoxPlayer1.getSelectedItem()==null && comboBoxPlayer2.getSelectedItem()==null && comboBoxReferees.getSelectedItem() == null){
+                    
+                    JOptionPane.showMessageDialog(gamePanel, "Sorry, the system does not allow empty spaces.", "Error", JOptionPane.ERROR_MESSAGE);
+            
+                }else{
+    
+                    if(comboBoxPlayer1.getSelectedItem() == comboBoxPlayer2.getSelectedItem()){
+
+                        JOptionPane.showMessageDialog(gamePanel, "Sorry, the system does not allow repeated players.", "Error", JOptionPane.ERROR_MESSAGE);
+
+                    }else{
+
+                        gamesArr[totalGames] = new Game(PlayersRegister.get(comboBoxPlayer1.getSelectedItem().toString()), PlayersRegister.get(comboBoxPlayer2.getSelectedItem().toString()), RefereeRegister.get(comboBoxReferees.getSelectedItem().toString()));
+                        actualGame = totalGames;
+                        totalGames++;
+
+                        // gamesArr[actualGame].startGame();
+
+                        textArea.setText("");
+                        textArea.append("New game created");
+                        break;
+                    }
+                }
+
+            }else if (selection==1){
+                textArea.setText("The operation was cancelled.\n\tNo game was created.");
+                break;
+            }
+        }
+
+        
     }
     
     public void addPerson() {
@@ -124,10 +187,13 @@ public class AppMenuGUI {
         } else {
             PlayersRegister.put(name, new Jugador(name, age, totalRegistered + 1));
         }
+        
+        textArea.setText("");
         textArea.append("Person added: " + name + "\n");
     }
     
     public void showPersonStats() {
+        textArea.setText("");
         StringBuilder personsList = new StringBuilder("Registered persons:\n");
         PlayersRegister.values().forEach(j -> personsList.append(j.getId()).append(" - ").append(j.getNombre()).append("\n"));
         RefereeRegister.values().forEach(r -> personsList.append(r.getId()).append(" - ").append(r.getNombre()).append("\n"));
@@ -175,6 +241,7 @@ public class AppMenuGUI {
         } else {
             actualGame = gameNumber - 1;
             gamesArr[actualGame].startGame();
+            textArea.setText("");
             textArea.append("Continuing game " + gameNumber + "\n");
         }
     }
@@ -185,6 +252,7 @@ public class AppMenuGUI {
             return;
         }
         gamesArr[actualGame].startGame();
+        textArea.setText("");
         textArea.append("Continuing last game\n");
     }
 
