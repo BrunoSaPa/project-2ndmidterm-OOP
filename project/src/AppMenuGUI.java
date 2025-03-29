@@ -1,8 +1,8 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import javax.swing.*;
 
 public class AppMenuGUI {
     protected HashMap<String, Jugador> PlayersRegister = new HashMap<>(); 
@@ -18,14 +18,30 @@ public class AppMenuGUI {
     public AppMenuGUI() {
         frame = new JFrame("Game Menu");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
+        frame.setSize(700, 700);
         
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 1));
+        panel.setLayout(new GridLayout(1, 2)); 
         
-        textArea = new JTextArea(10, 30);
+        // First column for text area
+        JPanel textPanel = new JPanel(new BorderLayout());
+        textArea = new JTextArea(3, 1); 
+        textArea.setPreferredSize(new Dimension(800, 600)); 
         textArea.setEditable(false);
-        panel.add(new JScrollPane(textArea));
+        textArea.setFont(new Font("Arial", Font.PLAIN, 18));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBackground(Color.LIGHT_GRAY);
+        textArea.setForeground(Color.BLACK);
+        textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        textArea.setMargin(new Insets(10, 10, 10, 10));
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        textPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Second column for buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(6, 1)); 
         
         newGameButton = new JButton("Create New Game");
         continueGameButton = new JButton("Continue a Past Game");
@@ -34,12 +50,24 @@ public class AppMenuGUI {
         showPersonStatsButton = new JButton("Show Person Stats");
         showGameStatsButton = new JButton("Show Game Stats");
         
-        panel.add(newGameButton);
-        panel.add(continueGameButton);
-        panel.add(continueLastGameButton);
-        panel.add(addPersonButton);
-        panel.add(showPersonStatsButton);
-        panel.add(showGameStatsButton);
+        buttonPanel.add(newGameButton);
+        buttonPanel.add(continueGameButton);
+        buttonPanel.add(continueLastGameButton);
+        buttonPanel.add(addPersonButton);
+        buttonPanel.add(showPersonStatsButton);
+        buttonPanel.add(showGameStatsButton);
+        
+        buttonPanel.setBackground(Color.DARK_GRAY);
+        newGameButton.setBackground(Color.LIGHT_GRAY);
+        continueGameButton.setBackground(Color.LIGHT_GRAY);
+        continueLastGameButton.setBackground(Color.LIGHT_GRAY);
+        addPersonButton.setBackground(Color.LIGHT_GRAY);
+        showPersonStatsButton.setBackground(Color.LIGHT_GRAY);
+        showGameStatsButton.setBackground(Color.LIGHT_GRAY);
+        
+        
+        panel.add(textPanel);
+        panel.add(buttonPanel);
         
         frame.add(panel);
         
@@ -47,6 +75,8 @@ public class AppMenuGUI {
         
         frame.setVisible(true);
     }
+    
+
     
     private void addActionListeners() {
         newGameButton.addActionListener(new ActionListener() {
@@ -154,6 +184,8 @@ public class AppMenuGUI {
     }
     
     public void addPerson() {
+        textArea.setText(null);
+
         int totalRegistered = PlayersRegister.size() + RefereeRegister.size();
         if (totalRegistered == 20) {
             JOptionPane.showMessageDialog(frame, "Sorry, the system has reached the registration limit.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -211,6 +243,7 @@ public class AppMenuGUI {
     }
     
     public void showGameStats() {
+        textArea.setText(null);
         if (totalGames == 0) {
             JOptionPane.showMessageDialog(frame, "There are no games to show.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -230,6 +263,7 @@ public class AppMenuGUI {
     }
     
     public void continueGame() {
+        textArea.setText(null);
         if (totalGames == 0) {
             JOptionPane.showMessageDialog(frame, "There are no games to continue.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -247,6 +281,7 @@ public class AppMenuGUI {
     }
     
     public void continueLastGame() {
+        textArea.setText(null);
         if (totalGames == 0) {
             JOptionPane.showMessageDialog(frame, "There are no games to continue.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
