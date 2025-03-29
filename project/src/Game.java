@@ -1,4 +1,15 @@
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Game implements Statistics{
     Jugador localJugador1 = null;
@@ -6,6 +17,13 @@ public class Game implements Statistics{
     Jugador Jugador1 = null;
     Jugador Jugador2 = null;
     Arbitro arbitro = null;
+    JFrame JF = null;
+    JDialog gameDialog = null;
+    JComboBox<String> typeGuesComBox = null;
+    JComboBox<Integer> xGuesComBox = null;
+    JComboBox<Integer> yGuesComBox = null;
+    JPanel inputsJPanel = null;
+    JLabel turnLabel = null;
 
     public int puntuacionTotal = 0;
     public int turnosJugados = 0;
@@ -19,123 +37,67 @@ public class Game implements Statistics{
 
     private int actualPlayer = 1;
 
-    public Game(Jugador j1, Jugador j2, Arbitro ar){
+    public Game(Jugador j1, Jugador j2, Arbitro ar , JFrame Jf){
         this.localJugador1 = new Jugador(j1);
         this.localJugador2 = new Jugador(j2);
         this.Jugador1 = j1;
         this.Jugador2 = j2;
         this.arbitro = ar;
+        this.JF = Jf;
 
         this.localJugador1.increaseJuegosJugados();
         this.localJugador2.increaseJuegosJugados();
         this.Jugador1.increaseJuegosJugados();
         this.Jugador2.increaseJuegosJugados();
 
-        this.board = new Board();
+        this.board = new Board(this.JF);
+        constructGameDialog();
     }
 
     public void startGame(){
+        if (this.board.wordsFound < 8) gameFinish=false;
+
         System.out.println(((gameFinish)?"The game already end.":"The game is about to start."));
         int selection = 5;
 
-        while (!gameFinish) {
-            
-            if(this.board.wordsFound == 8){
-                System.out.println("The game just ended. The winner is " + ((this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal())?this.localJugador1.getNombre():this.localJugador2.getNombre()));
-                this.increaseJuegosGanados();
-
-                if(this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal()){
-                    
-                    this.localJugador1.increaseJuegosGanados();
-                    this.Jugador1.increaseJuegosGanados();
-
-                }
-                else{
-                    
-                    this.localJugador2.increaseJuegosGanados();
-                    this.Jugador2.increaseJuegosGanados();
-
-                }
-                
-                this.gameFinish = true;
-                break;
-            } 
-
-            while((selection > 4 || selection < 0) || !gameFinish){
+            while(!gameFinish){
                 this.showGame();
-                selection = this.sc.nextInt();
-    
-                switch (selection) {
-                    case 1:
-                        this.selectStats();
-                        break;
-                
-                    case 2:
-                        this.turnAction(); 
-                        break;
-                
-                    case 3:
-                        System.out.println("Quiting the game...");
-                        gameFinish = true;
-                        break;
-                
-                    default:
-                        System.out.println("Enter a valid input.");
-                        break;
-                }
             }
-        }
+    }
 
-        if (selection == 3) gameFinish = false;
+    public void verifyGameEnd(){
+        if(this.board.wordsFound == 8){
+            System.out.println("The game just ended. The winner is " + ((this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal())?this.localJugador1.getNombre():this.localJugador2.getNombre()));
+            this.increaseJuegosGanados();
+
+            if(this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal()){
+                
+                this.localJugador1.increaseJuegosGanados();
+                this.Jugador1.increaseJuegosGanados();
+
+            }
+            else{
+                
+                this.localJugador2.increaseJuegosGanados();
+                this.Jugador2.increaseJuegosGanados();
+
+            }
+            
+            this.gameFinish = true;
+            this.gameDialog.setVisible(false);
+        } 
+
     }
 
     public void showGame(){
-        this.board.printMatrix();
-
-        System.out.println("\nThe current turn is for the player " + ((actualPlayer == 1)?localJugador1.getNombre():localJugador2.getNombre()));
-        System.out.println("\nChoose the action you want to do:\n\t1.Show stats\n\t2.Make a guess\n\t3.Quit the game.");
+        this.updatePanel();
+        gameDialog.setVisible(true);
     }
 
     private void turnAction(){
-        int[] coords = {0,0}; //index  0 = x and 1 = y
-        String type = ""; 
-
-        System.out.println("\n\n\n\n");
-        this.board.printMatrix();
-        System.out.println("Enter please your guess:");
-        
-        this.validateCoordinates(coords, 0);
-        this.validateCoordinates(coords, 1);
-
-        System.out.println("Introduce the type of the word you found: (Introduce the exact name without spaces after the type or capital letters that it doesnt have.) ");
-        System.out.println("-Diagonal down");
-        System.out.println("-Vertical down");
-        System.out.println("-Horizontal right");
-        type = this.sc.nextLine();
-        type = this.sc.nextLine();
-        
-        this.updateAllStats(this.board.VerifyGuessInWords(coords[0], coords[1], type));
-    }
-
-    private void validateCoordinates(int[] coord, int index){
-        int selection = 18;
-        
-        System.out.println("Coordinates starts in the top right coorner in (1,1).");
-        
-        while(selection > 16 || selection < 1){
-            System.out.println("Enter a number for the " + ((index == 0)?"x ":"y ") + "coordinate:");
-            selection = this.sc.nextInt();
-
-            
-            if (selection > 16 || selection < 1) {
-                System.out.println("Enter a valid input.");
-            }
-            else{
-                coord[index]= selection;
-                break;
-            }
-            
-        }
+        System.out.println("guess");
+        this.updateAllStats(this.board.VerifyGuessInWords(Integer.parseInt(xGuesComBox.getSelectedItem().toString()),Integer.parseInt( yGuesComBox.getSelectedItem().toString()), typeGuesComBox.getSelectedItem().toString()));
+        updatePanel();
     }
 
     private void selectStats(){
@@ -271,5 +233,76 @@ public class Game implements Statistics{
     @Override
     public void increaseJuegosJugados() {
         this.juegosGanados++;
+    }
+
+    private void constructGameDialog(){  
+        gameDialog = new JDialog();
+        gameDialog.setTitle("Game");
+        gameDialog.setSize(1100, 800);
+        gameDialog.setModal(true);
+        gameDialog.setLayout(new GridLayout(1, 2));
+        gameDialog.add(this.board.returnMatrixComponent());
+
+        this.inputsJPanel = new JPanel();
+        inputsJPanel.setLayout(new GridLayout(10, 1));
+        inputsJPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+        Integer[] coordlistOptions = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+        String[] typelistOptions = {"Diagonal down","Vertical down", "Horizontal right"};
+        this.turnLabel = new JLabel("The current turn is for the player " + ((actualPlayer == 1)?localJugador1.getNombre():localJugador2.getNombre()));
+        JLabel xGuessLabel = new JLabel("Input the x:");
+        this.xGuesComBox = new JComboBox<>(coordlistOptions);
+        JLabel yGuessLabel = new JLabel("Input the y:");
+        this.yGuesComBox = new JComboBox<>(coordlistOptions);
+        JLabel typeGuessLabel = new JLabel("Input the type of the word:");
+        this.typeGuesComBox = new JComboBox<>(typelistOptions);
+        JButton guessButton = new JButton("Make a guess");
+        JButton statsButton = new JButton("Stats");
+        JButton exiButton = new JButton("Exit from game");
+        
+        
+        inputsJPanel.add(turnLabel);
+        inputsJPanel.add(xGuessLabel);
+        inputsJPanel.add(xGuesComBox);
+        inputsJPanel.add(yGuessLabel);
+        inputsJPanel.add(yGuesComBox);
+        inputsJPanel.add(typeGuessLabel);
+        inputsJPanel.add(typeGuesComBox);
+        inputsJPanel.add(guessButton);
+        inputsJPanel.add(statsButton);
+        inputsJPanel.add(exiButton);
+
+        gameDialog.add(inputsJPanel);
+
+        
+        guessButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                turnAction();
+                verifyGameEnd();
+            }
+        });
+        
+        statsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectStats();
+            }
+        });
+
+        exiButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                gameFinish = true;
+                gameDialog.setVisible(false);
+            }
+        });
+    }
+
+    private void updatePanel(){
+        this.gameDialog.getContentPane().removeAll();
+        this.gameDialog.add(this.board.returnMatrixComponent());
+        this.gameDialog.add(this.inputsJPanel);
+        this.gameDialog.revalidate();
+        this.gameDialog.repaint();
+
+        this.turnLabel.setText("The current turn is for the player " + ((actualPlayer == 1)?localJugador1.getNombre():localJugador2.getNombre()));
     }
 }

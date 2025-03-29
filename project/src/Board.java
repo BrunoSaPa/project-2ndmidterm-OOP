@@ -1,5 +1,16 @@
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.Random;
-import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 
 
@@ -44,9 +55,11 @@ public class Board {
     public int wordsFound = 0;
     private Random r = new Random();
     private boolean[][] occupiedCells = new boolean[16][16];
+    private JFrame JF = null;
 
-    Board(){
+    Board(JFrame Jf){
         System.out.println("A new game is about to start...\n\n");
+        this.JF = Jf;
         this.fillWordList();
         this.putWordsInMatrix();
     }
@@ -109,15 +122,96 @@ public class Board {
     public void fillWordList() {
         //resetear las celdas ocupadas
         occupiedCells = new boolean[16][16];
-        Scanner sc = new Scanner(System.in);
-        System.out.println("The capture of the word is about to start.");
+
+        JLabel formTitle = new JLabel("Game constructor: Words\n\n");
+        formTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        
+        JTextField JtWord1 = new JTextField();
+        JTextField JtWord2 = new JTextField();
+        JTextField JtWord3 = new JTextField();
+        JTextField JtWord4 = new JTextField();
+        JTextField JtWord5 = new JTextField();
+        JTextField JtWord6 = new JTextField();
+        JTextField JtWord7 = new JTextField();
+        JTextField JtWord8 = new JTextField();
+
+        JPanel boardPanel = new JPanel(new GridLayout(0,1));
+        boardPanel.setPreferredSize(new Dimension(400,400));
+        boardPanel.add(formTitle);
+        boardPanel.add(new JLabel("Word 1:\t"));
+        boardPanel.add(JtWord1);
+        boardPanel.add(new JLabel("Word 2:\t"));
+        boardPanel.add(JtWord2);
+        boardPanel.add(new JLabel("Word 3:\t"));
+        boardPanel.add(JtWord3);
+        boardPanel.add(new JLabel("Word 4:\t"));
+        boardPanel.add(JtWord4);
+        boardPanel.add(new JLabel("Word 5:\t"));
+        boardPanel.add(JtWord5);
+        boardPanel.add(new JLabel("Word 6:\t"));
+        boardPanel.add(JtWord6);
+        boardPanel.add(new JLabel("Word 7:\t"));
+        boardPanel.add(JtWord7);
+        boardPanel.add(new JLabel("Word 8:\t"));
+        boardPanel.add(JtWord8);
+
+        String[] options = {"Continue", "Cancel"};
+        String[] wordListStr = new String[8];
+
+        boolean blankWords = false;
+        boolean biggerWords = false;
+
+        while (!blankWords && !biggerWords) {
+            blankWords = false;
+            biggerWords = false;
+            int selection = JOptionPane.showOptionDialog(this.JF, boardPanel, "Board", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+            if (selection == 0) {
+                wordListStr[0] = JtWord1.getText();
+                wordListStr[1] = JtWord2.getText();
+                wordListStr[2] = JtWord3.getText();
+                wordListStr[3] = JtWord4.getText();
+                wordListStr[4] = JtWord5.getText();
+                wordListStr[5] = JtWord6.getText();
+                wordListStr[6] = JtWord7.getText();
+                wordListStr[7] = JtWord8.getText();
+        
+                for (String s : wordListStr) {
+                    if (s.isEmpty()) {
+                        System.out.println("Aqui hubo un error.");
+                        System.out.println("-" + s + "-");
+                        blankWords = true;
+                    } else if (s.length() != 5) {
+                        System.out.println("Aqui hubo un error.");
+                        System.out.println("-" + s + "-");
+                        biggerWords = true;
+                    }
+                }
+                
+                // Si no hay palabras vacías ni palabras más grandes que 5 caracteres, salimos del ciclo
+                if (!blankWords && !biggerWords) {
+                    break;
+                } else {
+                            // Mostrar un mensaje de error para que el usuario corrija su entrada
+                        if (blankWords) {
+                            JOptionPane.showMessageDialog(boardPanel, "No blank spaces are accepted.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                        if (biggerWords) {
+                            JOptionPane.showMessageDialog(boardPanel, "The words must be of 5 characters length.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else if (selection == 1) {
+                    JOptionPane.showMessageDialog(boardPanel, "Sorry but you need to initialize the board before you do anything else.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // Salir del ciclo si el usuario cierra la ventana
+                    break;
+                }
+            }
+
+                
         
         for (int index = 0; index < 8; index++) {
             while (true) {
-                System.out.println("Introduce the word that is going to be added to the board:\t");
-                String w = sc.nextLine().toUpperCase();
-
-                if (w.length() == 5) {
                     Word newWord = null;
                     boolean wordPlaced = false;
 
@@ -127,16 +221,15 @@ public class Board {
                         int t = r.nextInt(3);
                         switch (t) {
                             case 0: 
-                                newWord = new Word(r.nextInt(12), r.nextInt(16), Word.TYPEOF.HorRight, w);
+                                newWord = new Word(r.nextInt(12), r.nextInt(16), Word.TYPEOF.HorRight, wordListStr[index]);
                                 break;
                             case 1: 
-                                newWord = new Word(r.nextInt(16), r.nextInt(12), Word.TYPEOF.VerDown, w);
+                                newWord = new Word(r.nextInt(16), r.nextInt(12), Word.TYPEOF.VerDown, wordListStr[index]);
                                 break;
                             case 2: 
-                                newWord = new Word(r.nextInt(12), r.nextInt(12), Word.TYPEOF.DigDown, w);
+                                newWord = new Word(r.nextInt(12), r.nextInt(12), Word.TYPEOF.DigDown, wordListStr[index]);
                                 break;
                         }
-
 
                         if (canPlaceWord(newWord)) {
                             this.wordList[index] = newWord;
@@ -146,19 +239,18 @@ public class Board {
                         }
                     }
 
-                    
                     if (!wordPlaced) {
-                        System.out.println("Could not place the word after many attempts. Please try a different word.");
                         index--; 
                         continue;
                     }
-                    break;
-                }
 
-                System.out.println("The word must be of 5 characters length");
+                    break;
             }
         }
+
+        System.out.println("Todo salio bien.");
     }
+
     public void fillMatrixWithRandom() {
         int[] unicodeLetras = {
             65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77,
@@ -187,19 +279,6 @@ public class Board {
         }
     }
 
-    public void printMatrix(){
-        for (int i = 0; i < 16; i++){
-            for (int subI = 0; subI < 16; subI++){
-                if (this.matrix[i][subI] == '■'){
-                    System.out.print(ANSI_RED);
-                }else{
-                    System.out.print(ANSI_RESET);
-                }
-                System.out.print(this.matrix[i][subI] + " ");
-            }
-            System.out.println("");
-        }
-    }
     int[] unicodeLetras = {
         65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77,
         78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
@@ -245,5 +324,52 @@ public class Board {
         for (int i = 0; i < 5; i++){
             this.matrix[w.posY + i * dirY][w.posX + i*dirX] = '■';
         }
+    }
+
+    public void printMatrix(){
+        for (int i = 0; i < 16; i++){
+            for (int subI = 0; subI < 16; subI++){
+                if (this.matrix[i][subI] == '■'){
+                    System.out.print(ANSI_RED);
+                }else{
+                    System.out.print(ANSI_RESET);
+                }
+                System.out.print(this.matrix[i][subI] + " ");
+            }
+            System.out.println("");
+        }
+    }
+
+    public JPanel returnMatrixComponent(){
+        JPanel Jp = new JPanel(new GridLayout(17,17));
+        Jp.setPreferredSize(new Dimension(400,400));
+
+        for (int i = 0 ; i < 17 ; i++){
+            if(i == 0){
+                Jp.add(new JLabel("  "));
+            } else{
+                Jp.add(new JLabel(String.valueOf(i) + " "));
+            }
+        }
+
+        for (int i = 0; i < 16; i++){
+            Jp.add(new JLabel(String.valueOf(i+1)));
+
+            for (int subI = 0; subI < 16; subI++){
+                JLabel temp;
+                
+                if (this.matrix[i][subI] == '■'){
+                    temp = new JLabel("<html><span style='color:red'>" + this.matrix[i][subI] +  "  </span></html>");
+                } else{
+                    temp = new JLabel(this.matrix[i][subI] +  "  ");
+                }
+                
+                temp.setBorder(new EmptyBorder(5,5,5,5));
+                Jp.add(temp);
+            }
+        }
+
+        Jp.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        return Jp;
     }
 }

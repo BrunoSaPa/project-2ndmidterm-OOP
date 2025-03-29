@@ -60,7 +60,7 @@ public class AppMenu {
         String j2 = this.verifyIfPersonExists("Player");
         String ar = this.verifyIfPersonExists("Referee");
 
-        gamesArr[totalGames] = new Game(PlayersRegister.get(j1), PlayersRegister.get(j2), RefereeRegister.get(ar));
+        gamesArr[totalGames] = new Game(PlayersRegister.get(j1), PlayersRegister.get(j2), RefereeRegister.get(ar), null);
         actualGame = totalGames;
         totalGames++;
 

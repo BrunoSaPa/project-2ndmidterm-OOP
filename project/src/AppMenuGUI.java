@@ -162,7 +162,7 @@ public class AppMenuGUI {
 
                     }else{
 
-                        gamesArr[totalGames] = new Game(PlayersRegister.get(comboBoxPlayer1.getSelectedItem().toString()), PlayersRegister.get(comboBoxPlayer2.getSelectedItem().toString()), RefereeRegister.get(comboBoxReferees.getSelectedItem().toString()));
+                        gamesArr[totalGames] = new Game(PlayersRegister.get(comboBoxPlayer1.getSelectedItem().toString()), PlayersRegister.get(comboBoxPlayer2.getSelectedItem().toString()), RefereeRegister.get(comboBoxReferees.getSelectedItem().toString()), frame);
                         actualGame = totalGames;
                         totalGames++;
 
@@ -268,8 +268,21 @@ public class AppMenuGUI {
             JOptionPane.showMessageDialog(frame, "There are no games to continue.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        JPanel continueGamePanel = new JPanel(new GridLayout(0, 1));
+        continueGamePanel.add(new Label("List of games:"));
+        JLabel games = new JLabel();
+        int count  = 1;
+        for (Game g : this.gamesArr){
+            if (g == null) break;
+
+            games.setText(games.getText() + "\n-Game number " + count);
+        }
+
+        continueGamePanel.add(games);
+        continueGamePanel.add(new JLabel("\nEnter the game number to continue:"));
+
+        int gameNumber = Integer.parseInt(JOptionPane.showInputDialog(frame,continueGamePanel));
         
-        int gameNumber = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter the game number to continue:"));
         if (gameNumber < 1 || gameNumber > totalGames) {
             JOptionPane.showMessageDialog(frame, "Invalid game number.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
