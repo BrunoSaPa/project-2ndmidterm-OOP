@@ -243,7 +243,7 @@ public class AppMenuGUI {
     }
     
     public void showGameStats() {
-        textArea.setText(null);
+        textArea.setText("");
         if (totalGames == 0) {
             JOptionPane.showMessageDialog(frame, "There are no games to show.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -254,11 +254,29 @@ public class AppMenuGUI {
             gamesList.append("Game number ").append(i + 1).append("\n");
         }
         
-        int gameNumber = Integer.parseInt(JOptionPane.showInputDialog(frame, gamesList.append("\nEnter the game number to view stats:").toString()));
-        if (gameNumber < 1 || gameNumber > totalGames) {
-            JOptionPane.showMessageDialog(frame, "Invalid game number.", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            //textArea.append(gamesArr[gameNumber - 1].showGameStats() + "\n");
+        String input = JOptionPane.showInputDialog(frame, gamesList.append("\nEnter the game number to view stats:").toString());
+        
+        if (input == null || input.trim().isEmpty()) {
+            textArea.append("Operation cancelled.");
+            return;
+        }
+        
+        try {
+            int gameNumber = Integer.parseInt(input);
+            if (gameNumber < 1 || gameNumber > totalGames) {
+                JOptionPane.showMessageDialog(frame, "Invalid game number.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                Game selectedGame = gamesArr[gameNumber - 1];
+                textArea.append("Game " + gameNumber + " Statistics:\n\n");
+                textArea.append("Total turns played: " + selectedGame.turnosJugados + "\n");
+                textArea.append("Total correct answers: " + selectedGame.puntuacionTotal + "\n");
+                textArea.append("\nPlayer 1: " + selectedGame.localJugador1.getNombre() + "\n");
+                textArea.append(selectedGame.localJugador1.getDatos() + "\n");
+                textArea.append("\nPlayer 2: " + selectedGame.localJugador2.getNombre() + "\n");
+                textArea.append(selectedGame.localJugador2.getDatos() + "\n");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
