@@ -1,3 +1,4 @@
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Game implements Statistics{
@@ -29,9 +31,6 @@ public class Game implements Statistics{
     public int turnosJugados = 0;
     public int juegosJugados = 0;
     public int juegosGanados = 0;
-
-    private Scanner sc = new Scanner(System.in);
-
     private Board board = null;
     public boolean gameFinish = false;
 
@@ -50,15 +49,17 @@ public class Game implements Statistics{
         this.Jugador1.increaseJuegosJugados();
         this.Jugador2.increaseJuegosJugados();
 
-        this.board = new Board(this.JF);
+        this.board = new Board();
         constructGameDialog();
     }
 
     public void startGame(){
+        while(!this.board.filled){
+            this.board.fillWordList();
+            if(this.board.filled) this.board.putWordsInMatrix();
+        }
+       
         if (this.board.wordsFound < 8) gameFinish=false;
-
-        System.out.println(((gameFinish)?"The game already end.":"The game is about to start."));
-        int selection = 5;
 
             while(!gameFinish){
                 this.showGame();
@@ -67,7 +68,6 @@ public class Game implements Statistics{
 
     public void verifyGameEnd(){
         if(this.board.wordsFound == 8){
-            System.out.println("The game just ended. The winner is " + ((this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal())?this.localJugador1.getNombre():this.localJugador2.getNombre()));
             this.increaseJuegosGanados();
 
             if(this.localJugador1.getPuntuacionTotal()>this.localJugador2.getPuntuacionTotal()){
@@ -95,92 +95,66 @@ public class Game implements Statistics{
     }
 
     private void turnAction(){
-        System.out.println("guess");
         this.updateAllStats(this.board.VerifyGuessInWords(Integer.parseInt(xGuesComBox.getSelectedItem().toString()),Integer.parseInt( yGuesComBox.getSelectedItem().toString()), typeGuesComBox.getSelectedItem().toString()));
         updatePanel();
     }
 
-    private void selectStats(){
-        int selection = 123;
-        while(selection > 4 || selection < 0){
-            System.out.println("Select for what type of stats you want to look at:\n\t1.Current\n\t2.Global stats of the players\n\t3.Game stats");
-            selection = this.sc.nextInt();
+    private void showStats(){
+        JDialog Jd = new JDialog();
+        Jd.setTitle("Stats");
+        Jd.setSize(300, 300);
+        Jd.setModal(true);
+        Jd.setLayout(new GridLayout(7, 1));
 
-            switch (selection) {
-                case 1:
-                    this.showCurrentStats(); 
-                    break;
-            
-                case 2:
-                    this.showGlobalStats();
-                    break;
-            
-                case 3:
-                    this.showGameStats();
-                    break;
-            
-                default:
-                    System.out.println("Enter a valid input.");
-                    break;
-            }
-        }
+        String[] personOptions =  {"Game", Jugador1.getNombre(), Jugador2.getNombre()};
+        String[] typeOptions = {"Current", "Global"};
 
-        System.out.println("\n\n");
-    }
+        JLabel titleLabel = new JLabel("Select what kind of stat are you looking at:");
+        JComboBox<String>  personComBox = new JComboBox<>(personOptions);
+        JComboBox<String>  typeComBox = new JComboBox<>(typeOptions);
+        JButton confirmButton = new JButton("Confirm");
+        JButton exitButton = new JButton("Exit");
+        
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-    private void showCurrentStats(){
-        int selection = 0;
+        Jd.add(titleLabel);
+        Jd.add(new JLabel("Person:"));
+        Jd.add(personComBox);
+        Jd.add(new JLabel("Type:"));
+        Jd.add(typeComBox);
+        Jd.add(confirmButton);
+        Jd.add(exitButton);
+        
+        confirmButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String Message;
 
-        while (selection != 1 && selection != 2) {
-            System.out.println("\n\nSelect for which player you want to look at:\n\t1."+ this.Jugador1.getNombre() + "\n\t2." + this.Jugador2.getNombre() );
-            selection = this.sc.nextInt();
-            
-            switch (selection) {
-                case 1:
-                    localJugador1.getDatos();
-                    break;
-                case 2:
-                    localJugador2.getDatos();
-                    break;
-            
-                default:
-                    System.out.println("Enter a valid input.");
-                    break;
-            }
-        }
-    }
-
-    private void showGlobalStats(){
-        int selection = 0;
-
-        while (selection != 1 && selection != 2) {
-            System.out.println("\n\nSelect for which player you want to look at:\n\t1."+ this.Jugador1.getNombre() + "\n\t2." + this.Jugador2.getNombre() );
-            selection = this.sc.nextInt();
-
-            switch (selection) {
-                case 1:
-                    Jugador1.getDatos();
-                    break;
-                case 2:
-                    Jugador2.getDatos();
-                    break;
+                if (personComBox.getSelectedItem().toString()=="Game"){ 
                     
-                default:
-                System.out.println("Enter a valid input.");
-                break;
+                    Message =  "Current game stats:\nTotal number of turns played: " + turnosJugados + "\nTotal number of correct answers:" + puntuacionTotal + "\n" + localJugador1.getDatos() + "\n" + localJugador2.getDatos();
+
+                } else if(personComBox.getSelectedItem().toString()==Jugador1.getNombre()){
+
+                    Message = "Stats of player: " + Jugador1.getNombre() + "\n" + ((typeComBox.getSelectedItem().toString()=="Current")?localJugador1.getDatos():Jugador1.getDatos());
+
+                } else{
+                    
+                    Message = "Stats of player: " + Jugador2.getNombre() + "\n" + ((typeComBox.getSelectedItem().toString()=="Current")?localJugador2.getDatos():Jugador2.getDatos());
+
+                }
+
+                JOptionPane.showMessageDialog(Jd, Message, "Info", JOptionPane.INFORMATION_MESSAGE);
+                Jd.setVisible(false);
             }
-        }
-    }
+        });
 
-    public void showGameStats(){
-        System.out.println("\n\nCurrent game stats:");
-        System.out.println("Total number of turns played: " + this.turnosJugados);
-        System.out.println("Total number of correct answers: " + this.puntuacionTotal);
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Jd.setVisible(false);
+            }
+        });
 
-        System.out.println("Players stats during the game:");
-        this.localJugador1.getDatos();
-        System.out.println();
-        this.localJugador2.getDatos();
+        Jd.setVisible(true);
     }
 
     public void updateAllStats(boolean guess){
@@ -284,7 +258,7 @@ public class Game implements Statistics{
         
         statsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                selectStats();
+                showStats();
             }
         });
 

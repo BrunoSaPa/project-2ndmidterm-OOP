@@ -1,15 +1,17 @@
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 
@@ -55,13 +57,11 @@ public class Board {
     public int wordsFound = 0;
     private Random r = new Random();
     private boolean[][] occupiedCells = new boolean[16][16];
-    private JFrame JF = null;
+    public boolean filled = false;
 
-    Board(JFrame Jf){
-        System.out.println("A new game is about to start...\n\n");
-        this.JF = Jf;
+    Board(){
         this.fillWordList();
-        this.putWordsInMatrix();
+        if(this.filled) this.putWordsInMatrix();
     }
 
 
@@ -122,6 +122,7 @@ public class Board {
     public void fillWordList() {
         //resetear las celdas ocupadas
         occupiedCells = new boolean[16][16];
+        String[] wordListStr = new String[8];
 
         JLabel formTitle = new JLabel("Game constructor: Words\n\n");
         formTitle.setFont(new Font("Arial", Font.BOLD, 24));
@@ -134,8 +135,24 @@ public class Board {
         JTextField JtWord6 = new JTextField();
         JTextField JtWord7 = new JTextField();
         JTextField JtWord8 = new JTextField();
+        JButton confirmButton = new JButton("Continue");
 
-        JPanel boardPanel = new JPanel(new GridLayout(0,1));
+        JtWord1.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord2.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord3.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord4.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord5.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord6.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord7.setBorder(new EmptyBorder(2,2,2,2));
+        JtWord8.setBorder(new EmptyBorder(2,2,2,2));
+        confirmButton.setBorder(new EmptyBorder(2,2,2,2));
+
+        JDialog boardPanel = new JDialog();
+        boardPanel.setTitle("Stats");
+        boardPanel.setSize(400, 800);
+        boardPanel.setModal(true);
+        boardPanel.setLayout(new GridLayout(20, 1));
+
         boardPanel.setPreferredSize(new Dimension(400,400));
         boardPanel.add(formTitle);
         boardPanel.add(new JLabel("Word 1:\t"));
@@ -154,19 +171,13 @@ public class Board {
         boardPanel.add(JtWord7);
         boardPanel.add(new JLabel("Word 8:\t"));
         boardPanel.add(JtWord8);
+        boardPanel.add(confirmButton);
 
-        String[] options = {"Continue", "Cancel"};
-        String[] wordListStr = new String[8];
+        confirmButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean blankWords = false;
+                boolean biggerWords = false;
 
-        boolean blankWords = false;
-        boolean biggerWords = false;
-
-        while (!blankWords && !biggerWords) {
-            blankWords = false;
-            biggerWords = false;
-            int selection = JOptionPane.showOptionDialog(this.JF, boardPanel, "Board", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-
-            if (selection == 0) {
                 wordListStr[0] = JtWord1.getText();
                 wordListStr[1] = JtWord2.getText();
                 wordListStr[2] = JtWord3.getText();
@@ -178,77 +189,69 @@ public class Board {
         
                 for (String s : wordListStr) {
                     if (s.isEmpty()) {
-                        System.out.println("Aqui hubo un error.");
-                        System.out.println("-" + s + "-");
                         blankWords = true;
                     } else if (s.length() != 5) {
-                        System.out.println("Aqui hubo un error.");
-                        System.out.println("-" + s + "-");
                         biggerWords = true;
                     }
                 }
                 
                 // Si no hay palabras vacías ni palabras más grandes que 5 caracteres, salimos del ciclo
                 if (!blankWords && !biggerWords) {
-                    break;
-                } else {
-                            // Mostrar un mensaje de error para que el usuario corrija su entrada
-                        if (blankWords) {
-                            JOptionPane.showMessageDialog(boardPanel, "No blank spaces are accepted.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                        if (biggerWords) {
-                            JOptionPane.showMessageDialog(boardPanel, "The words must be of 5 characters length.", "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                    for (int index = 0; index < 8; index++) {
+                        while (true) {
+                                Word newWord = null;
+                                boolean wordPlaced = false;
+
+                                // Try 1000 attempts to place the word
+                                for (int attempt = 0; attempt < 1000; attempt++) {
+                                    // Randomly choose word type and position
+                                    int t = r.nextInt(3);
+                                    switch (t) {
+                                        case 0: 
+                                            newWord = new Word(r.nextInt(12), r.nextInt(16), Word.TYPEOF.HorRight, wordListStr[index]);
+                                            break;
+                                        case 1: 
+                                            newWord = new Word(r.nextInt(16), r.nextInt(12), Word.TYPEOF.VerDown, wordListStr[index]);
+                                            break;
+                                        case 2: 
+                                            newWord = new Word(r.nextInt(12), r.nextInt(12), Word.TYPEOF.DigDown, wordListStr[index]);
+                                            break;
+                                    }
+
+                                    if (canPlaceWord(newWord)) {
+                                        wordList[index] = newWord;
+                                        markCellsOccupied(newWord);
+                                        wordPlaced = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!wordPlaced) {
+                                    index--; 
+                                    continue;
+                                }
+
+                                break;
                         }
                     }
-                } else if (selection == 1) {
-                    JOptionPane.showMessageDialog(boardPanel, "Sorry but you need to initialize the board before you do anything else.", "Error", JOptionPane.ERROR_MESSAGE);
+                    filled = true;
+                    boardPanel.setVisible(false);
+
                 } else {
-                    // Salir del ciclo si el usuario cierra la ventana
-                    break;
+                    // Mostrar un mensaje de error para que el usuario corrija su entrada
+                    if (blankWords) {
+                        JOptionPane.showMessageDialog(boardPanel, "No blank spaces are accepted.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    if (biggerWords) {
+                        JOptionPane.showMessageDialog(boardPanel, "The words must be of 5 characters length.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
-
-                
+        });  
         
-        for (int index = 0; index < 8; index++) {
-            while (true) {
-                    Word newWord = null;
-                    boolean wordPlaced = false;
-
-                    // Try 1000 attempts to place the word
-                    for (int attempt = 0; attempt < 1000; attempt++) {
-                        // Randomly choose word type and position
-                        int t = r.nextInt(3);
-                        switch (t) {
-                            case 0: 
-                                newWord = new Word(r.nextInt(12), r.nextInt(16), Word.TYPEOF.HorRight, wordListStr[index]);
-                                break;
-                            case 1: 
-                                newWord = new Word(r.nextInt(16), r.nextInt(12), Word.TYPEOF.VerDown, wordListStr[index]);
-                                break;
-                            case 2: 
-                                newWord = new Word(r.nextInt(12), r.nextInt(12), Word.TYPEOF.DigDown, wordListStr[index]);
-                                break;
-                        }
-
-                        if (canPlaceWord(newWord)) {
-                            this.wordList[index] = newWord;
-                            markCellsOccupied(newWord);
-                            wordPlaced = true;
-                            break;
-                        }
-                    }
-
-                    if (!wordPlaced) {
-                        index--; 
-                        continue;
-                    }
-
-                    break;
-            }
-        }
-
-        System.out.println("Todo salio bien.");
+        boardPanel.setVisible(true);
+        
     }
 
     public void fillMatrixWithRandom() {
